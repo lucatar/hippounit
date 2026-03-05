@@ -137,7 +137,8 @@ class ObliqueIntegrationTest(Test):
                  base_directory= None,
                  show_plot=True,
                  save_all = True,
-                 trunk_origin = None):
+                 trunk_origin = None,
+                 save_all_traces = True):
 
         observation = self.format_data(observation)
         observation = self.add_std_to_observation(observation)
@@ -150,6 +151,7 @@ class ObliqueIntegrationTest(Test):
         self.force_run_bin_search = force_run_bin_search
         self.show_plot = show_plot
         self.save_all = save_all
+        self.save_all_traces = save_all_traces
 
         self.base_directory = base_directory
 
@@ -162,7 +164,7 @@ class ObliqueIntegrationTest(Test):
 
         self.npool = multiprocessing.cpu_count() - 1
 
-        self.max_num_syn = 10
+        self.max_num_syn = 10 # 10 volt eredetileg!!!!!!!
 
         self.threshold_index = 5  #threshold input number for dendritic spike generation  - index 0 is 0 input
 
@@ -236,7 +238,7 @@ class ObliqueIntegrationTest(Test):
 
 
         try:
-            if not os.path.exists(path) and self.save_all:
+            if not os.path.exists(path) and self.save_all_traces:
                 os.makedirs(path)
         except OSError as e:
             if e.errno != 17:
@@ -250,14 +252,14 @@ class ObliqueIntegrationTest(Test):
 
         if self.force_run_synapse or (os.path.isfile(file_name) is False):
 
-            print("- number of inputs:", num, "dendrite:", ndend, "xloc:", xloc)
+            #print("- number of inputs:", num, "dendrite:", ndend, "xloc:", xloc)
 
 
             t, v, v_dend = model.run_multiple_synapse_get_vm([ndend, xloc, loc_type], interval, num, weight)
 
             result = self.analyse_syn_traces(model, t, v, v_dend, model.threshold)
 
-            if self.save_all:
+            if self.save_all_traces:
                 pickle.dump(result, gzip.GzipFile(file_name, "wb"))
 
         else:
@@ -1687,10 +1689,12 @@ class ObliqueIntegrationTest(Test):
                 raise
             pass
 
+        if self.max_num_syn != model.max_num_syn:
+            model.max_num_syn = self.max_num_syn
 
         model.find_obliques_multiproc(self.trunk_origin)
 
-        print('Dendrites and locations to be tested: ', model.dend_loc)
+        #print('Dendrites and locations to be tested: ', model.dend_loc)
 
         traces = []
 
@@ -1766,7 +1770,7 @@ class ObliqueIntegrationTest(Test):
                     dend_loc_num_weight.append(e)        #calculates, and adds the synaptic weights needed to a list
             #print dend_loc_num_weight
             interval_sync=0.3 # taking the laser pulse duration (0.2 ms) into account #0.1
-
+            #print("dend_loc_num_weight", dend_loc_num_weight[0])
             pool = multiprocessing.Pool(self.npool, maxtasksperchild=1)
             run_synapse_ = functools.partial(self.run_synapse, model, interval=interval_sync)
             results = pool.map(run_synapse_, dend_loc_num_weight, chunksize=1)
@@ -1984,7 +1988,7 @@ class ObliqueIntegrationTest(Test):
         plt.ylabel("p values")
         fig = plt.gcf()
         fig.set_size_inches(12, 10)
-        if self.save_all and self.path_figs is not None:
+        if self.save_all and self.path_figs != None:
             plt.savefig(self.path_figs + 'p_values' + '.pdf', dpi=600, bbox_inches='tight')
 
         plt.figure(figsize = (210/25.4, 210/25.4))
@@ -1997,7 +2001,7 @@ class ObliqueIntegrationTest(Test):
         plt.yticks(list(range(len(list(errors_dict.keys())))), labels)
         plt.title('Errors')
         plt.xlabel('error (# sd)')
-        if self.save_all and self.path_figs is not None:
+        if self.save_all and self.path_figs != None:
             plt.savefig(self.path_figs + 'mean_errors' + '.pdf', dpi=600, bbox_inches='tight')
 
 
@@ -2019,7 +2023,7 @@ class ObliqueIntegrationTest(Test):
 
     def bind_score(self, score, model, observation, prediction):
 
-        if self.path_figs is not None:
+        if self.path_figs != None:
              score.related_data["figures"] = [self.path_figs + 'errors_sync.pdf', self.path_figs + 'input_output_curves_async.pdf',
                                         self.path_figs + 'input_output_curves_sync.pdf', self.path_figs + 'mean_errors.pdf',
                                         self.path_figs + 'mean_values_sync.pdf', self.path_figs + 'nonlin_errors_async.pdf',

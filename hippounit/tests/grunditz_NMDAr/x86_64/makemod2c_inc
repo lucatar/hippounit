@@ -1,0 +1,9 @@
+
+./nmda_Grunditz.c: ../nmda_Grunditz.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) nmda_Grunditz.mod -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/grunditz_NMDAr/x86_64")
+
+./nmda_Grunditz.o: ./nmda_Grunditz.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+

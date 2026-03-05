@@ -1,0 +1,8 @@
+./NMDA_M_tau.c: ../NMDA_M_tau.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "NMDA_M_tau.mod" -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/major_nmda_tau/x86_64")
+
+./NMDA_M_tau.o: ./NMDA_M_tau.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+

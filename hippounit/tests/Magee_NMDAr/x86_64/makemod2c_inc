@@ -1,0 +1,9 @@
+
+./NMDA_CA1_pyr_SC_2_comp_Magee.c: ../NMDA_CA1_pyr_SC_2_comp_Magee.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) NMDA_CA1_pyr_SC_2_comp_Magee.mod -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/Magee_NMDAr/x86_64")
+
+./NMDA_CA1_pyr_SC_2_comp_Magee.o: ./NMDA_CA1_pyr_SC_2_comp_Magee.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+

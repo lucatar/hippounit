@@ -1,0 +1,32 @@
+./NMDA_CA1_pyr_SC_2_comp_midway.c: ../NMDA_CA1_pyr_SC_2_comp_midway.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "NMDA_CA1_pyr_SC_2_comp_midway.mod" -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/default_NMDAr/x86_64")
+
+./NMDA_CA1_pyr_SC_2_comp_midway.o: ./NMDA_CA1_pyr_SC_2_comp_midway.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
+./NMDA_CA1_pyr_SC_2_comp.c: ../NMDA_CA1_pyr_SC_2_comp.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "NMDA_CA1_pyr_SC_2_comp.mod" -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/default_NMDAr/x86_64")
+
+./NMDA_CA1_pyr_SC_2_comp.o: ./NMDA_CA1_pyr_SC_2_comp.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
+./NMDA_CA1_pyr_SC_midway.c: ../NMDA_CA1_pyr_SC_midway.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "NMDA_CA1_pyr_SC_midway.mod" -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/default_NMDAr/x86_64")
+
+./NMDA_CA1_pyr_SC_midway.o: ./NMDA_CA1_pyr_SC_midway.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
+./NMDA_CA1_pyr_SC.c: ../NMDA_CA1_pyr_SC.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "..";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "NMDA_CA1_pyr_SC.mod" -o "/home/tarluca/Modellke_story/hippounit_Spine_project_20221102/hippounit/hippounit/tests/default_NMDAr/x86_64")
+
+./NMDA_CA1_pyr_SC.o: ./NMDA_CA1_pyr_SC.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+

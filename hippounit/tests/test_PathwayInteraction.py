@@ -319,7 +319,7 @@ class PathwayInteraction(Test):
 
             if pathway == 'SC':
 
-                model.SecList_name = model.ObliqueSecList_name
+                model.SecList = model.ObliqueSecList_name
                 dend_loc, locations_distances = model.get_random_locations_multiproc(10, self.random_seed, dist_range, self.trunk_origin) # number of random locations , seed
                 PP_dend_loc =[] 
                 num_of_loc = model.get_num_of_possible_locations()
@@ -331,7 +331,7 @@ class PathwayInteraction(Test):
 
 
             elif pathway == 'PP':
-                model.SecList_name = model.TuftSecList_name
+                model.SecList = model.TuftSecList_name
                 dend_loc, locations_distances = model.get_random_locations_multiproc(10, self.random_seed, dist_range, self.trunk_origin) # number of random locations , seed
                 
                 SC_dend_loc =[] 
@@ -386,9 +386,9 @@ class PathwayInteraction(Test):
 
                     if max_depol < exp_depol - exp_depol_sd and prev_max_depol < exp_depol - exp_depol_sd:
                         if pathway == 'SC':
-                            model.SecList_name = model.ObliqueSecList_name
+                            model.SecList = model.ObliqueSecList_name
                         elif pathway == 'PP':
-                            model.SecList_name = model.TuftSecList_name
+                            model.SecList = model.TuftSecList_name
                         
                         prev_dend_loc = list(dend_loc)
              
@@ -1116,6 +1116,7 @@ class PathwayInteraction(Test):
         plateau_durations = []
 
         num_APs_list = []
+        num_APs_soma_list = []
         ISIs_list = []
         bAP_amp_list = []
 
@@ -1149,12 +1150,18 @@ class PathwayInteraction(Test):
             
 
             if pathway == 'SC+PP':
-                efel_results_soma = self.extract_efel_features(0, time[stop_index] - time[start_index], [time[start_index:stop_index], v_soma[start_index:stop_index]], ['ISI_values'])
+                efel_results_soma = self.extract_efel_features(0, time[stop_index] - time[start_index], [time[start_index:stop_index], v_soma[start_index:stop_index]], ['ISI_values', 'Spikecount'])
                 ISI = efel_results_soma['ISI_values']
+                num_APs_soma = efel_results_soma['Spikecount'][0]
                 if ISI is None:
                     ISI = []
+                if num_APs_soma is None:
+                    num_APs_soma = []
                 #print('ISI: ', ISI)
                 ISIs_list.append(numpy.mean(ISI))
+                print('num_APs_soma:', num_APs_soma)
+                num_APs_soma_list.append(num_APs_soma)
+                print('num_APs_soma_list:', num_APs_soma_list)
                 #print('ISIs_list: ', ISIs_list)
 
 
@@ -1178,7 +1185,7 @@ class PathwayInteraction(Test):
 
         #print(features)
 
-        return features
+        return features, num_APs_soma_list
 
 
     def plot_features(self, prediction):
@@ -1411,10 +1418,10 @@ class PathwayInteraction(Test):
 
         dist_range = [0,9999999999]
 
-        model.SecList_name = model.ObliqueSecList_name
+        model.SecList = model.ObliqueSecList_name
         SC_dend_loc, SC_locations_distances = model.get_random_locations_multiproc(self.num_of_dend_locations, self.random_seed, dist_range, self.trunk_origin) # number of random locations , seed
 
-        model.SecList_name = model.TuftSecList_name
+        model.SecList = model.TuftSecList_name
         PP_dend_loc, PP_locations_distances = model.get_random_locations_multiproc(self.num_of_dend_locations, self.random_seed, dist_range, self.trunk_origin) # number of random locations , seed
 
         """Finding recording location on Trunk whose distance is closest to 300 um"""
@@ -1508,11 +1515,13 @@ class PathwayInteraction(Test):
         print('Extracting features')
 
         prediction = {}
+        spike_counts = {}
         for pathway, traces in traces_dict.items():
             if pathway != 'depol':
-                features = self.extract_features(model, traces, [t_no_input_rec_dend, v_soma_no_input, v_no_input_rec_dend], stimuli_params, pathway)
+                features, spikecount_soma = self.extract_features(model, traces, [t_no_input_rec_dend, v_soma_no_input, v_no_input_rec_dend], stimuli_params, pathway)
                 prediction.update(features)
-        #print(prediction)
+                spike_counts[pathway] = spikecount_soma
+                #print('spikecount soma:', spike_counts)
 
 
         ''' printing to logFile'''
@@ -1550,8 +1559,23 @@ class PathwayInteraction(Test):
 
         json.dump(prediction_json, open(file_name_json, "w"), indent=4)
 
-        self.plot_features(prediction)
+        spike_counts_json = copy.deepcopy(spike_counts)
+        print('Ellenorzes: ', spike_counts_json)
+        for key, val in list(spike_counts.items()):
+            try:
+                val = str(val)
+                quantity_parts = val.split("*")
+                spike_counts_json[key] = " ".join(quantity_parts)
+            except:
+                spike_counts_json[key] = str(val)
 
+
+
+        spike_counts_file_name_json = self.path_results + 'pathway_interaction_model_features_spike_counts.json'
+
+        json.dump(spike_counts_json, open(spike_counts_file_name_json, "w"), indent=4)
+
+        self.plot_features(prediction)
 
 
         print("Results are saved in the directory: ", self.path_results)
